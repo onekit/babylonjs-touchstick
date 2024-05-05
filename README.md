@@ -5,17 +5,7 @@ This TypeScript class extends the functionality of the standard VirtualJoystick 
 
 ## Install
 
-To add module as dependency to your BabylonJS project:
-```shell
-npm add onekit/babylonjs-touchstick
-```
-or
-```shell
-yarn add onekit/babylonjs-touchstick
-```
-
-or just download and use `TouchStick.ts` as is.
-
+Just download and use `TouchStick.ts`. 
 
 ## Parameters
 
@@ -46,9 +36,10 @@ Original `deltaPosition`, but with smoothing.
 
 ## Usage
 
-### TypeScript: 
-```TS
-import { TouchStick } from 'babylonjs-touchstick'
+### TypeScript:
+
+```typescript
+import TouchStick from './TouchStick'
 
 export class TouchInput {
 
