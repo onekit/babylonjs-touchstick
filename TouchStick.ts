@@ -102,7 +102,6 @@ class TouchStick extends VirtualJoystick {
             Math.abs(deltaX) <= thresholdX
         ) {
 
-          // when hold longer than 500 ms
           this.holdCenter = true
           return
         }
@@ -139,7 +138,6 @@ class TouchStick extends VirtualJoystick {
 
 
   private filterAxisDelta(delta: number, threshold: number = 0.00002): number {
-    // const sign = Math.sign(delta)
     delta = delta * delta * delta
     if (delta > threshold) {
       delta -= threshold
