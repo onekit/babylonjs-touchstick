@@ -116,7 +116,7 @@ class TouchStick extends VirtualJoystick {
 
         if (this.tap) {
           // Detect double tap
-          if (this.endTap < 650) {
+          if (this.endTap < 750) {
             this.doubleTap = true
             this.tap = false
           }

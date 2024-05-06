@@ -1,0 +1,4 @@
+/node_modules/
+docker-compose.yml
+yarn.lock
+package-lock.json

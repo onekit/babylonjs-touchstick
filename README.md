@@ -1,11 +1,19 @@
 
-# babylonjs-touchstick
+# babylonjs-touchstick v.0.0.2
 
 This TypeScript class extends the functionality of the standard VirtualJoystick in BabylonJS. It provides smooth motion delta with movement filtering, and gesture information such as swipe, hold, hold center, and tap. Additionally, you can directly obtain Vector3 from the joystick for controlling the character.
 
 ## Install
 
-Just download and use `TouchStick.ts`. 
+### NPM
+```shell
+npm i babylonjs-touchstick
+```
+
+### Yarn
+```shell
+yarn add babylonjs-touchstick
+```
 
 ## Parameters
 
@@ -40,7 +48,7 @@ Original `deltaPosition`, but with smoothing.
 ### TypeScript:
 
 ```typescript
-import TouchStick from './TouchStick'
+import TouchStick from 'babylonjs-touchstick'
 
 export class TouchInput {
 
