@@ -18,6 +18,7 @@ class TouchStick extends VirtualJoystick {
     left: false,
   }
   tap: boolean = false
+  doubleTap: boolean = false
   hold: boolean = false
   holdCenter: boolean = false
   threshold: number = 0.00002
@@ -64,9 +65,6 @@ class TouchStick extends VirtualJoystick {
 
     if (pressed) {
       this.lastStartTouchTime = currentTime
-      if (!this.tap) {
-        this.lastStartTapTime = currentTime
-      }
 
       if (this.endTouch < 150 && this.startTouch < 150) {
 
@@ -106,19 +104,33 @@ class TouchStick extends VirtualJoystick {
           return
         }
       }
+
+      if (!this.tap) {
+        this.lastStartTapTime = currentTime
+      }
     } else {
 
       // short tap
-      if (!this.tap && this.startTap < 150 && this.endSwipe > 350) {
-        this.tap = !(this.startTap < 150 && this.hold) && this.endTap > 50
-        this.lastEndTapTime = currentTime
+      if (!this.doubleTap && !this.tap && this.startTap < 50 && this.endSwipe > 350) {
+        this.tap = !(this.startTap < 50 && this.hold) && this.endTap > 50
+
+        if (this.tap) {
+          // Detect double tap
+          if (this.endTap < 250) {
+            this.doubleTap = true
+            this.tap = false
+          }
+          this.lastEndTapTime = currentTime;
+        }
       } else {
         this.tap = false
+        this.doubleTap = false
       }
 
-      this.reset()
       this.lastEndTouchTime = currentTime
+      this.reset()
     }
+
   }
 
   private smoothDeltaPosition() {

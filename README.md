@@ -12,6 +12,7 @@ Just download and use `TouchStick.ts`.
 ### Tap
 
 - `tap`: Represents a quick single touch.
+- `doubleTap`: Represents a quick double tap.
 
 ### Swipe
 
