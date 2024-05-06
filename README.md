@@ -43,14 +43,15 @@ import TouchStick from './TouchStick'
 
 export class TouchInput {
 
-    private stick: TouchStick = new TouchStick(true);
+    private stickLeft: TouchStick = new TouchStick(true);
+    private stickRight: TouchStick = new TouchStick(false);
     
     private check() {
-        if (this.stick.swipe.up) {
-            console.log('Swiped up')
+        if (this.stickLeft.swipe.up || this.stickRight.swipe.up) {
+            console.log('Swiped up both sticks')
         }
         
-        if (this.stick.holdCenter) {
+        if (this.stickLeft.holdCenter) {
             console.log('Enter menu')
         }
     }
