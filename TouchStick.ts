@@ -36,6 +36,7 @@ class TouchStick extends VirtualJoystick {
 
   constructor(isLeftStick: boolean) {
     super(isLeftStick)
+    this.setJoystickSensibility(1)
     this.setupListener()
   }
 
@@ -73,41 +74,43 @@ class TouchStick extends VirtualJoystick {
           this.swipe.up = deltaY > 0
           this.swipe.down = deltaY < 0
         } else if (
-          Math.abs(deltaX) > thresholdX &&
-          Math.abs(deltaY) < thresholdY
+            Math.abs(deltaX) > thresholdX &&
+            Math.abs(deltaY) < thresholdY
         ) {
           this.swipe.right = deltaX > 0
           this.swipe.left = deltaX < 0
         }
         if (
-          this.swipe.up ||
-          this.swipe.down ||
-          this.swipe.left ||
-          this.swipe.right
+            this.swipe.up ||
+            this.swipe.down ||
+            this.swipe.left ||
+            this.swipe.right
         ) {
           this.lastEndSwipeTime = currentTime
+          return
         }
-      } else if (this.endTouch > 250 && this.startTouch < 250) {
+      } else if (this.endTouch > 200 && this.startTouch < 200) {
         if (!this.hold) {
           this.lastStartHoldTime = currentTime
         }
         this.hold = true
 
         if (
-          this.startHold > 500 &&
-          this.startHold < 700 &&
-          Math.abs(deltaY) <= thresholdY &&
-          Math.abs(deltaX) <= thresholdX
+            this.startHold > 700 &&
+            this.startHold < 900 &&
+            Math.abs(deltaY) <= thresholdY &&
+            Math.abs(deltaX) <= thresholdX
         ) {
 
           // when hold longer than 500 ms
           this.holdCenter = true
+          return
         }
       }
     } else {
 
       // short tap
-      if (!this.tap && this.startTap < 150 && this.endSwipe > 150) {
+      if (!this.tap && this.startTap < 150 && this.endSwipe > 350) {
         this.tap = !(this.startTap < 150 && this.hold) && this.endTap > 50
         this.lastEndTapTime = currentTime
       } else {
@@ -120,10 +123,10 @@ class TouchStick extends VirtualJoystick {
   }
 
   private smoothDeltaPosition() {
-     return {
-      x: this.filterAxisDelta(this.deltaPosition.x, this.threshold),
-      y: this.filterAxisDelta(this.deltaPosition.y, this.threshold)
-     }
+    return {
+      x: this.filterAxisDelta(this.deltaPosition.x, this.threshold) * 1500,
+      y: this.filterAxisDelta(this.deltaPosition.y, this.threshold) * 1500
+    }
   }
 
   private getDirection(deltaX: number, deltaY: number): Vector3 {
@@ -136,6 +139,7 @@ class TouchStick extends VirtualJoystick {
 
 
   private filterAxisDelta(delta: number, threshold: number = 0.00002): number {
+    // const sign = Math.sign(delta)
     delta = delta * delta * delta
     if (delta > threshold) {
       delta -= threshold
