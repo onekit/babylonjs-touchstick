@@ -45,7 +45,7 @@ Original `deltaPosition`, but with smoothing.
 
 ## Usage
 
-### TypeScript:
+### TypeScript example:
 
 ```typescript
 import TouchStick from 'babylonjs-touchstick'
@@ -55,15 +55,28 @@ export class TouchInput {
     private stickLeft: TouchStick = new TouchStick(true);
     private stickRight: TouchStick = new TouchStick(false);
     
-    private check() {
+    private handleEvents() {
+        const { swipe, tap, doubleTap, hold, holdCenter } = this.stickRight;
+        
+        if (swipe.down) {
+            console.log('Swiped down right stick')
+        }
+        
+        if (doubleTap) {
+            console.log('Double tap')
+        }
+
+        if (holdCenter) {
+            console.log('Enter menu')
+        }
+        
         if (this.stickLeft.swipe.up || this.stickRight.swipe.up) {
             console.log('Swiped up both sticks')
         }
         
-        if (this.stickLeft.holdCenter) {
-            console.log('Enter menu')
-        }
     }
 
 }
 ```
+
+Read official documentation of original `BABYLON.VirtualJoystick` for more information: https://doc.babylonjs.com/features/featuresDeepDive/input/virtualJoysticks
