@@ -1,5 +1,9 @@
 ## BabylonJS Touch Stick change log
 
+#### 0.0.5 - 2024-05-07
+
+- ReadMe file updated
+
 #### 0.0.4 - 2024-05-07
 
 - upgraded direction function to allow use direction.length() for delta movement
