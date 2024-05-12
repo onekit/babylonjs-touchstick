@@ -1,11 +1,13 @@
-import {Vector3, VirtualJoystick} from 'babylonjs'
+import { Vector3, VirtualJoystick } from 'babylonjs'
 
 class TouchStick extends VirtualJoystick {
     direction: Vector3 = Vector3.Zero()
+    private directionMaxLength: number = 2.5
+    private sensitivity: number = 300
     deltaPositionSmoothed: {
         x: number
         y: number
-    } = {x: 0, y: 0}
+    } = { x: 0, y: 0 }
     swipe: {
         up: boolean
         down: boolean
@@ -35,6 +37,30 @@ class TouchStick extends VirtualJoystick {
     private endTap: number = 0
     private endSwipe: number = 0
 
+    getThreshold(): number {
+        return this.threshold
+    }
+
+    setThreshold(threshold: number) {
+        this.threshold = threshold
+    }
+
+    getSensitivity(): number {
+        return this.sensitivity
+    }
+
+    setSensitivity(sensitivity: number) {
+        this.sensitivity = sensitivity
+    }
+
+    getDirectionMaxLength() {
+        return this.directionMaxLength
+    }
+
+    setDirectionMaxLength(directionMaxLength: number) {
+        this.directionMaxLength = directionMaxLength
+    }
+
     constructor(isLeftStick: boolean) {
         super(isLeftStick)
         this.setJoystickSensibility(1)
@@ -44,12 +70,15 @@ class TouchStick extends VirtualJoystick {
     private setupListener = () => {
         this.detect()
         this.deltaPositionSmoothed = this.smoothDeltaPosition()
-        this.direction = this.getDirection(this.deltaPositionSmoothed.x, this.deltaPositionSmoothed.y)
+        this.direction = this.getDirection(
+            this.deltaPositionSmoothed.x,
+            this.deltaPositionSmoothed.y,
+        )
         requestAnimationFrame(this.setupListener)
     }
 
     detect(): void {
-        const {pressed, deltaPosition} = this
+        const { pressed, deltaPosition } = this
         const currentTime = new Date().getTime()
         this.startTouch = currentTime - this.lastStartTouchTime
         this.endTouch = currentTime - this.lastEndTouchTime
@@ -67,7 +96,6 @@ class TouchStick extends VirtualJoystick {
             this.lastStartTouchTime = currentTime
 
             if (this.endTouch < 150 && this.startTouch < 150) {
-
                 if (Math.abs(deltaY) > thresholdY && Math.abs(deltaX) < thresholdX) {
                     this.swipe.up = deltaY > 0
                     this.swipe.down = deltaY < 0
@@ -99,7 +127,6 @@ class TouchStick extends VirtualJoystick {
                     Math.abs(deltaY) <= thresholdY &&
                     Math.abs(deltaX) <= thresholdX
                 ) {
-
                     this.holdCenter = true
                     return
                 }
@@ -109,18 +136,22 @@ class TouchStick extends VirtualJoystick {
                 this.lastStartTapTime = currentTime
             }
         } else {
-
             // short tap
-            if (!this.doubleTap && !this.tap && this.startTap < 30 && this.endSwipe > 350) {
-                this.tap = !(this.startTap < 30 && this.hold) && this.endTap > 30
+            if (
+                !this.doubleTap &&
+                !this.tap &&
+                this.startTap < 50 &&
+                this.endSwipe > 350
+            ) {
+                this.tap = !(this.startTap < 50 && this.hold) && this.endTap > 150
 
                 if (this.tap) {
                     // Detect double tap
-                    if (this.endTap < 750) {
+                    if (this.endTap < 450) {
                         this.doubleTap = true
                         this.tap = false
                     }
-                    this.lastEndTapTime = currentTime;
+                    this.lastEndTapTime = currentTime
                 }
             } else {
                 this.tap = false
@@ -130,27 +161,26 @@ class TouchStick extends VirtualJoystick {
             this.lastEndTouchTime = currentTime
             this.reset()
         }
-
     }
 
     private smoothDeltaPosition() {
         return {
             x: this.filterAxisDelta(this.deltaPosition.x, this.threshold) * 1500,
-            y: this.filterAxisDelta(this.deltaPosition.y, this.threshold) * 1500
+            y: this.filterAxisDelta(this.deltaPosition.y, this.threshold) * 1500,
         }
     }
 
     private getDirection(deltaX: number, deltaY: number): Vector3 {
-        const deltaPosition = {x: deltaX, y: deltaY}
+        const deltaPosition = { x: deltaX, y: deltaY }
         const joystickVector = new Vector3(deltaPosition.x, 0, deltaPosition.y)
         if (joystickVector.length() === 0) {
             return Vector3.Zero()
         }
 
-        const scaleFactor = 3.5
-        const scaledLength = Math.pow(joystickVector.length(), scaleFactor) * 100000;
-        const cappedLength = Math.min(scaledLength, 7.8)
-        return joystickVector.normalize().scale(cappedLength);
+        const scaleFactor = 3
+        const scaledLength = Math.pow(joystickVector.length(), scaleFactor) * this.sensitivity
+        const cappedLength = Math.min(scaledLength, this.directionMaxLength)
+        return joystickVector.normalize().scale(cappedLength)
     }
 
     private filterAxisDelta(delta: number, threshold: number = 0.00002): number {
@@ -169,11 +199,10 @@ class TouchStick extends VirtualJoystick {
         this.direction = Vector3.Zero()
         this.hold = false
         this.holdCenter = false
-        this.swipe = {up: false, down: false, right: false, left: false}
+        this.swipe = { up: false, down: false, right: false, left: false }
         this.deltaPosition.y = 0
         this.deltaPosition.x = 0
     }
-
 }
 
 export default TouchStick

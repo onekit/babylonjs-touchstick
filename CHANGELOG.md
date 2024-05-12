@@ -1,5 +1,11 @@
 ## BabylonJS Touch Stick change log
 
+
+#### 0.0.6 - 2024-05-12
+
+- added private parameters for stick: sensitivity, directionMaxLength (to cap maximum of length in direction parameter)
+- fixed error with fast double tap
+
 #### 0.0.5 - 2024-05-07
 
 - ReadMe file updated
