@@ -2,8 +2,8 @@ import { Vector3, VirtualJoystick } from 'babylonjs'
 
 class TouchStick extends VirtualJoystick {
     direction: Vector3 = Vector3.Zero()
-    private directionMaxLength: number = 2.5
-    private sensitivity: number = 300
+    private directionMaxLength: number = 3
+    private directionSensitivity: number = 350
     deltaPositionSmoothed: {
         x: number
         y: number
@@ -45,12 +45,12 @@ class TouchStick extends VirtualJoystick {
         this.threshold = threshold
     }
 
-    getSensitivity(): number {
-        return this.sensitivity
+    getDirectionSensitivity(): number {
+        return this.directionSensitivity
     }
 
-    setSensitivity(sensitivity: number) {
-        this.sensitivity = sensitivity
+    setDirectionSensitivity(directionSensitivity: number) {
+        this.directionSensitivity = directionSensitivity
     }
 
     getDirectionMaxLength() {
@@ -71,8 +71,8 @@ class TouchStick extends VirtualJoystick {
         this.detect()
         this.deltaPositionSmoothed = this.smoothDeltaPosition()
         this.direction = this.getDirection(
-            this.deltaPositionSmoothed.x,
-            this.deltaPositionSmoothed.y,
+            this.deltaPosition.x,
+            this.deltaPosition.y,
         )
         requestAnimationFrame(this.setupListener)
     }
@@ -176,9 +176,8 @@ class TouchStick extends VirtualJoystick {
         if (joystickVector.length() === 0) {
             return Vector3.Zero()
         }
-
         const scaleFactor = 3
-        const scaledLength = Math.pow(joystickVector.length(), scaleFactor) * this.sensitivity
+        const scaledLength = Math.pow(joystickVector.length(), scaleFactor) * this.directionSensitivity
         const cappedLength = Math.min(scaledLength, this.directionMaxLength)
         return joystickVector.normalize().scale(cappedLength)
     }
