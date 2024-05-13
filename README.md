@@ -84,7 +84,9 @@ export class TouchInput {
     handleMovement(mesh: AbstractMesh) {
         mesh.position
             .add(this.stickLeft.direction)
-            .scale(this.stickLeft.direction.legth())
+        
+        mesh.position
+            .scale(this.stickLeft.direction.length())
     }
 
 }
