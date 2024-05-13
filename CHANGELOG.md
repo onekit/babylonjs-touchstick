@@ -1,5 +1,9 @@
 ## BabylonJS Touch Stick change log
 
+#### 0.0.7 - 2024-05-13
+
+- mistype in readme file
+- example of usage
 
 #### 0.0.6 - 2024-05-12
 
