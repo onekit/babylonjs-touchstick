@@ -49,19 +49,24 @@ Original `deltaPosition`, but with smoothing.
 
 ```typescript
 import TouchStick from 'babylonjs-touchstick'
+import { AbstractMesh } from 'babylonjs'
 
 export class TouchInput {
 
     private stickLeft: TouchStick = new TouchStick(true);
     private stickRight: TouchStick = new TouchStick(false);
-    
+
+    constructor() {
+        this.stickLeft.setDirectionMaxLength(3) // cap for maximum distance of BABYLON.Vector3 length
+    }
+
     private handleEvents() {
-        const { swipe, tap, doubleTap, hold, holdCenter } = this.stickRight;
-        
+        const {swipe, tap, doubleTap, hold, holdCenter} = this.stickRight;
+
         if (swipe.down) {
             console.log('Swiped down right stick')
         }
-        
+
         if (doubleTap) {
             console.log('Double tap')
         }
@@ -69,11 +74,17 @@ export class TouchInput {
         if (holdCenter) {
             console.log('Enter menu')
         }
-        
+
         if (this.stickLeft.swipe.up || this.stickRight.swipe.up) {
             console.log('Swiped up both sticks')
         }
-        
+
+    }
+    
+    handleMovement(mesh: AbstractMesh) {
+        mesh.position
+            .add(this.stickLeft.direction)
+            .scale(this.stickLeft.direction.legth())
     }
 
 }
