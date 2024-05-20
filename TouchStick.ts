@@ -40,7 +40,6 @@ class TouchStick extends VirtualJoystick {
     private endTap: number = 0
     private endSwipe: number = 0
     private endHold: number = 0
-    private thinking: boolean = false
 
     getThreshold(): number {
         return this.threshold
@@ -83,7 +82,6 @@ class TouchStick extends VirtualJoystick {
     }
 
     detect() {
-        if (this.thinking) return
         const { pressed, deltaPosition } = this
         const currentTime = new Date().getTime()
         this.startTouch = currentTime - this.lastStartTouchTime
