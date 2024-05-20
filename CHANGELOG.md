@@ -1,5 +1,11 @@
 ## BabylonJS Touch Stick change log
 
+#### 0.0.8 - 2024-05-20
+
+- fixed error with detect short Tap after long hold
+- structured code for separate functions
+- improved default values of sensitivity and direction cap length
+
 #### 0.0.7 - 2024-05-13
 
 - mistype in readme file

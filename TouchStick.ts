@@ -2,8 +2,8 @@ import { Vector3, VirtualJoystick } from 'babylonjs'
 
 class TouchStick extends VirtualJoystick {
     direction: Vector3 = Vector3.Zero()
-    private directionMaxLength: number = 3
-    private directionSensitivity: number = 350
+    private directionMaxLength: number = 2.8
+    private directionSensitivity: number = 12000
     deltaPositionSmoothed: {
         x: number
         y: number
@@ -23,19 +23,24 @@ class TouchStick extends VirtualJoystick {
     doubleTap: boolean = false
     hold: boolean = false
     holdCenter: boolean = false
-    threshold: number = 0.00002
+    threshold: number = 0
     private lastStartTouchTime: number = 0
     private lastEndTouchTime: number = 0
     private lastStartHoldTime: number = 0
+    private lastStartHoldCenterTime: number = 0
     private lastStartTapTime: number = 0
     private lastEndTapTime: number = 0
     private lastEndSwipeTime: number = 0
+    private lastEndHoldTime: number = 0
     private startTouch: number = 0
     private endTouch: number = 0
     private startHold: number = 0
+    private startHoldCenter: number = 0
     private startTap: number = 0
     private endTap: number = 0
     private endSwipe: number = 0
+    private endHold: number = 0
+    private thinking: boolean = false
 
     getThreshold(): number {
         return this.threshold
@@ -77,96 +82,99 @@ class TouchStick extends VirtualJoystick {
         requestAnimationFrame(this.setupListener)
     }
 
-    detect(): void {
+    detect() {
+        if (this.thinking) return
         const { pressed, deltaPosition } = this
         const currentTime = new Date().getTime()
         this.startTouch = currentTime - this.lastStartTouchTime
         this.endTouch = currentTime - this.lastEndTouchTime
         this.startHold = currentTime - this.lastStartHoldTime
+        this.endHold = currentTime - this.lastEndHoldTime
+        this.startHoldCenter = currentTime - this.lastStartHoldCenterTime
         this.startTap = currentTime - this.lastStartTapTime
         this.endTap = currentTime - this.lastEndTapTime
         this.endSwipe = currentTime - this.lastEndSwipeTime
 
-        const thresholdY = 0.02
-        const thresholdX = 0.002
-        const deltaY = deltaPosition.y
-        const deltaX = deltaPosition.x
-
         if (pressed) {
             this.lastStartTouchTime = currentTime
-
-            if (this.endTouch < 150 && this.startTouch < 150) {
-                if (Math.abs(deltaY) > thresholdY && Math.abs(deltaX) < thresholdX) {
-                    this.swipe.up = deltaY > 0
-                    this.swipe.down = deltaY < 0
-                } else if (
-                    Math.abs(deltaX) > thresholdX &&
-                    Math.abs(deltaY) < thresholdY
-                ) {
-                    this.swipe.right = deltaX > 0
-                    this.swipe.left = deltaX < 0
-                }
-                if (
-                    this.swipe.up ||
-                    this.swipe.down ||
-                    this.swipe.left ||
-                    this.swipe.right
-                ) {
-                    this.lastEndSwipeTime = currentTime
-                    return
-                }
-            } else if (this.endTouch > 200 && this.startTouch < 200) {
-                if (!this.hold) {
-                    this.lastStartHoldTime = currentTime
-                }
-                this.hold = true
-
-                if (
-                    this.startHold > 700 &&
-                    this.startHold < 900 &&
-                    Math.abs(deltaY) <= thresholdY &&
-                    Math.abs(deltaX) <= thresholdX
-                ) {
-                    this.holdCenter = true
-                    return
-                }
-            }
-
+            this.detectSwipes(deltaPosition)
+            this.detectHold(currentTime)
+            this.detectHoldCenter(currentTime, deltaPosition)
             if (!this.tap) {
                 this.lastStartTapTime = currentTime
             }
         } else {
-            // short tap
-            if (
-                !this.doubleTap &&
-                !this.tap &&
-                this.startTap < 50 &&
-                this.endSwipe > 350
-            ) {
-                this.tap = !(this.startTap < 50 && this.hold) && this.endTap > 150
-
-                if (this.tap) {
-                    // Detect double tap
-                    if (this.endTap < 450) {
-                        this.doubleTap = true
-                        this.tap = false
-                    }
-                    this.lastEndTapTime = currentTime
-                }
-            } else {
-                this.tap = false
-                this.doubleTap = false
-            }
-
+            this.detectTap(currentTime)
             this.lastEndTouchTime = currentTime
             this.reset()
         }
     }
 
+    private detectSwipes(deltaPosition: { x: number, y: number }) {
+        const thresholdY = 0.12
+        const thresholdX = 0.12
+        const deltaY = deltaPosition.y
+        const deltaX = deltaPosition.x
+
+        if (this.endTouch < 150 && this.startTouch < 150) {
+            if (Math.abs(deltaY) > thresholdY && Math.abs(deltaX) < thresholdX) {
+                this.swipe.up = deltaY > 0
+                this.swipe.down = deltaY < 0
+            } else if (Math.abs(deltaX) > thresholdX && Math.abs(deltaY) < thresholdY) {
+                this.swipe.right = deltaX > 0
+                this.swipe.left = deltaX < 0
+            }
+            if (this.swipe.up || this.swipe.down || this.swipe.left || this.swipe.right) {
+                this.lastEndSwipeTime = new Date().getTime()
+            }
+        }
+    }
+
+    private detectHold(currentTime: number) {
+        if (this.endTouch > 400 && this.startTouch < 400) {
+            if (!this.hold) {
+                this.lastStartHoldTime = currentTime
+            }
+            this.hold = true
+        } else {
+            this.lastEndHoldTime = currentTime
+        }
+    }
+
+    private detectHoldCenter(currentTime: number, deltaPosition: { x: number, y: number }) {
+        const thresholdY = 0.01
+        const thresholdX = 0.01
+        const deltaY = deltaPosition.y
+        const deltaX = deltaPosition.x
+
+        if (this.startHold < 500 && this.hold && !this.holdCenter && Math.abs(deltaY) <= thresholdY && Math.abs(deltaX) <= thresholdX) {
+            this.lastStartHoldCenterTime = currentTime
+            this.holdCenter = true
+        } else if (this.startHoldCenter >= 500) {
+            this.holdCenter = false
+        }
+    }
+
+    private detectTap(currentTime: number) {
+        if (!this.doubleTap && !this.tap && !this.hold && this.startTap < 50 && this.endSwipe > 350) {
+            this.tap = !(this.startTap < 50 && this.hold) && this.endTap > 150 && (!this.hold && this.endHold < 250)
+            if (this.tap) {
+                if (this.endTap < 450) {
+                    this.doubleTap = true
+                    this.tap = false
+                }
+                this.lastEndTapTime = currentTime
+            }
+        } else {
+            this.tap = false
+            this.doubleTap = false
+        }
+    }
+
     private smoothDeltaPosition() {
         return {
-            x: this.filterAxisDelta(this.deltaPosition.x, this.threshold) * 1500,
-            y: this.filterAxisDelta(this.deltaPosition.y, this.threshold) * 1500,
+            x: this.filterAxisDelta(this.deltaPosition.x, this.threshold) * 4500,
+            y: this.filterAxisDelta(this.deltaPosition.y, this.threshold) * 4500,
         }
     }
 
@@ -177,7 +185,8 @@ class TouchStick extends VirtualJoystick {
             return Vector3.Zero()
         }
         const scaleFactor = 3
-        const scaledLength = Math.pow(joystickVector.length(), scaleFactor) * this.directionSensitivity
+        const scaledLength =
+            Math.pow(joystickVector.length(), scaleFactor) * this.directionSensitivity
         const cappedLength = Math.min(scaledLength, this.directionMaxLength)
         return joystickVector.normalize().scale(cappedLength)
     }
