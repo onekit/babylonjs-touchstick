@@ -109,12 +109,12 @@ class TouchStick extends VirtualJoystick {
     }
 
     private detectSwipes(deltaPosition: { x: number, y: number }) {
-        const thresholdY = 0.12
-        const thresholdX = 0.12
+        const thresholdY = 0.1
+        const thresholdX = 0.1
         const deltaY = deltaPosition.y
         const deltaX = deltaPosition.x
 
-        if (this.endTouch < 150 && this.startTouch < 150) {
+        if (this.endTouch < 400 && this.startTouch < 400) {
             if (Math.abs(deltaY) > thresholdY && Math.abs(deltaX) < thresholdX) {
                 this.swipe.up = deltaY > 0
                 this.swipe.down = deltaY < 0
@@ -129,7 +129,7 @@ class TouchStick extends VirtualJoystick {
     }
 
     private detectHold(currentTime: number) {
-        if (this.endTouch > 400 && this.startTouch < 400) {
+        if (this.endTouch > 600 && this.startTouch < 600) {
             if (!this.hold) {
                 this.lastStartHoldTime = currentTime
             }
@@ -145,10 +145,10 @@ class TouchStick extends VirtualJoystick {
         const deltaY = deltaPosition.y
         const deltaX = deltaPosition.x
 
-        if (this.startHold < 500 && this.hold && !this.holdCenter && Math.abs(deltaY) <= thresholdY && Math.abs(deltaX) <= thresholdX) {
+        if (this.startHold < 900 && this.hold && !this.holdCenter && Math.abs(deltaY) <= thresholdY && Math.abs(deltaX) <= thresholdX) {
             this.lastStartHoldCenterTime = currentTime
             this.holdCenter = true
-        } else if (this.startHoldCenter >= 500) {
+        } else if (this.startHoldCenter >= 900) {
             this.holdCenter = false
         }
     }

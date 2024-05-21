@@ -1,5 +1,10 @@
 ## BabylonJS Touch Stick change log
 
+#### 0.0.9 - 2024-05-21
+
+- fine-tuned swipes detection 
+- removed excessive code
+
 #### 0.0.8 - 2024-05-20
 
 - fixed error with detect short Tap after long hold
