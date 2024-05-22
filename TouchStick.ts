@@ -1,4 +1,5 @@
-import { Vector3, VirtualJoystick } from 'babylonjs'
+import { Scene, Vector3, VirtualJoystick } from 'babylonjs'
+import CanvasManager from './CanvasManager'
 
 class TouchStick extends VirtualJoystick {
     direction: Vector3 = Vector3.Zero()
@@ -40,6 +41,7 @@ class TouchStick extends VirtualJoystick {
     private endTap: number = 0
     private endSwipe: number = 0
     private endHold: number = 0
+    canvasManager: CanvasManager | undefined
 
     getThreshold(): number {
         return this.threshold
@@ -108,21 +110,29 @@ class TouchStick extends VirtualJoystick {
         }
     }
 
-    private detectSwipes(deltaPosition: { x: number, y: number }) {
+    private detectSwipes(deltaPosition: { x: number; y: number }) {
         const thresholdY = 0.1
         const thresholdX = 0.1
         const deltaY = deltaPosition.y
         const deltaX = deltaPosition.x
 
-        if (this.endTouch < 400 && this.startTouch < 400) {
+        if (this.endTouch < 300 && this.startTouch < 300) {
             if (Math.abs(deltaY) > thresholdY && Math.abs(deltaX) < thresholdX) {
                 this.swipe.up = deltaY > 0
                 this.swipe.down = deltaY < 0
-            } else if (Math.abs(deltaX) > thresholdX && Math.abs(deltaY) < thresholdY) {
+            } else if (
+                Math.abs(deltaX) > thresholdX &&
+                Math.abs(deltaY) < thresholdY
+            ) {
                 this.swipe.right = deltaX > 0
                 this.swipe.left = deltaX < 0
             }
-            if (this.swipe.up || this.swipe.down || this.swipe.left || this.swipe.right) {
+            if (
+                this.swipe.up ||
+                this.swipe.down ||
+                this.swipe.left ||
+                this.swipe.right
+            ) {
                 this.lastEndSwipeTime = new Date().getTime()
             }
         }
@@ -139,23 +149,42 @@ class TouchStick extends VirtualJoystick {
         }
     }
 
-    private detectHoldCenter(currentTime: number, deltaPosition: { x: number, y: number }) {
-        const thresholdY = 0.01
-        const thresholdX = 0.01
+    private detectHoldCenter(
+        currentTime: number,
+        deltaPosition: { x: number; y: number },
+    ) {
+        const thresholdY = 0.005
+        const thresholdX = 0.005
         const deltaY = deltaPosition.y
         const deltaX = deltaPosition.x
 
-        if (this.startHold < 900 && this.hold && !this.holdCenter && Math.abs(deltaY) <= thresholdY && Math.abs(deltaX) <= thresholdX) {
+        if (
+            this.startHold < 500 &&
+            this.hold &&
+            !this.holdCenter &&
+            Math.abs(deltaY) <= thresholdY &&
+            Math.abs(deltaX) <= thresholdX
+        ) {
             this.lastStartHoldCenterTime = currentTime
             this.holdCenter = true
-        } else if (this.startHoldCenter >= 900) {
+        } else if (this.startHoldCenter >= 500) {
             this.holdCenter = false
         }
     }
 
     private detectTap(currentTime: number) {
-        if (!this.doubleTap && !this.tap && !this.hold && this.startTap < 50 && this.endSwipe > 350) {
-            this.tap = !(this.startTap < 50 && this.hold) && this.endTap > 150 && (!this.hold && this.endHold < 250)
+        if (
+            !this.doubleTap &&
+            !this.tap &&
+            !this.hold &&
+            this.startTap < 50 &&
+            this.endSwipe > 350
+        ) {
+            this.tap =
+                !(this.startTap < 50 && this.hold) &&
+                this.endTap > 150 &&
+                !this.hold &&
+                this.endHold < 250
             if (this.tap) {
                 if (this.endTap < 450) {
                     this.doubleTap = true
@@ -208,6 +237,15 @@ class TouchStick extends VirtualJoystick {
         this.swipe = { up: false, down: false, right: false, left: false }
         this.deltaPosition.y = 0
         this.deltaPosition.x = 0
+    }
+
+    enableCanvasManager() {
+        this.canvasManager = new CanvasManager()
+    }
+
+    enableSwipeSwitcher(scene: Scene, gradient: boolean = true) {
+        this.enableCanvasManager()
+        this.canvasManager?.enableSwipeSwitcher(scene, gradient)
     }
 }
 

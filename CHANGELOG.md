@@ -1,5 +1,10 @@
 ## BabylonJS Touch Stick change log
 
+#### 0.0.10 - 2024-05-23
+
+- Swipe switcher 
+- Canvas manager (show/hide) 
+
 #### 0.0.9 - 2024-05-21
 
 - fine-tuned swipes detection 

@@ -15,6 +15,32 @@ npm i babylonjs-touchstick
 yarn add babylonjs-touchstick
 ```
 
+## Features
+### Swipe Switcher
+
+Swipe Switcher adds the ability to swipe up from the bottom of the screen to activate stick controls. Swiping down from the bottom of the screen hides the virtual joystick panel so that it does not overlap your main Canvas.
+```typescript
+const stick = new TouchStick(true)
+stick.enableSwipeSwitcher(scene)
+```
+or 
+```typescript
+stick.enableSwipeSwitcher(scene, false) // without gradient
+```
+As a parameter to the `enableSwipeSwitcher` method, pass the `BABYLON.Scene` of your application.
+
+### Canvas Manager
+
+If you want more control and prefer to manage the state of the virtual joystick panel yourself, showing or hiding it in your own way, you can enable only the canvasManager and use it like this:
+
+```typescript
+const stick = new TouchStick(true)
+stick.enableCanvasManager()
+stick.canvasManager.show()
+stick.canvasManager.hide()
+```
+
+
 ## Parameters
 
 ### Tap
@@ -49,34 +75,35 @@ Original `deltaPosition`, but with smoothing.
 
 ```typescript
 import TouchStick from 'babylonjs-touchstick'
-import { AbstractMesh } from 'babylonjs'
+import { Scene, AbstractMesh } from 'babylonjs'
 
 export class TouchInput {
 
     private stickLeft: TouchStick = new TouchStick(true);
     private stickRight: TouchStick = new TouchStick(false);
 
-    constructor() {
+    constructor(scene: Scene) {
+        this.stickLeft.enableSwipeSwitcher(scene)
         this.stickLeft.setDirectionMaxLength(3) // cap for maximum distance of BABYLON.Vector3 length
     }
 
     private handleEvents() {
         const {swipe, tap, doubleTap, hold, holdCenter} = this.stickRight;
 
+        if (this.stickLeft.swipe.up || this.stickRight.swipe.up) {
+            console.log('Swiped up both sticks')
+        }
+        
         if (swipe.down) {
             console.log('Swiped down right stick')
         }
-
-        if (doubleTap) {
-            console.log('Double tap')
-        }
-
+        
         if (holdCenter) {
             console.log('Enter menu')
         }
 
-        if (this.stickLeft.swipe.up || this.stickRight.swipe.up) {
-            console.log('Swiped up both sticks')
+        if (doubleTap) {
+            console.log('Double tap')
         }
 
     }
