@@ -63,12 +63,12 @@ export default class CanvasManager {
     const canvas = this.getCanvasWithoutId()
     this.visible = true
     if (canvas) {
-      this.setupStickCanvasListener()
-      this.removeAppCanvasListener()
       if (!gradient) {
         canvas.style.zIndex = '5'
         return
       }
+      this.setupStickCanvasListener()
+      this.removeAppCanvasListener()
       canvas.style.height = '100%'
       canvas.style.top = 'inherit'
       canvas.style.bottom = '0'
@@ -83,12 +83,12 @@ export default class CanvasManager {
     const canvas = this.getCanvasWithoutId()
     this.visible = false
     if (canvas) {
-      this.setupAppCanvasListener()
-      this.removeStickCanvasListener()
       if (!gradient) {
         canvas.style.zIndex = '-1'
         return
       }
+      this.setupAppCanvasListener()
+      this.removeStickCanvasListener()
       canvas.style.top = 'inherit'
       canvas.style.bottom = '0'
       canvas.style.height = '0%'
