@@ -1,5 +1,9 @@
 ## BabylonJS Touch Stick change log
 
+#### 0.0.11 - 2024-05-23
+
+- fixed issue with disabled Swipe switcher usage
+
 #### 0.0.10 - 2024-05-23
 
 - Swipe switcher 
