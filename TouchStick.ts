@@ -41,6 +41,7 @@ class TouchStick extends VirtualJoystick {
     private endTap: number = 0
     private endSwipe: number = 0
     private endHold: number = 0
+    private swipeHandled: boolean = false
     canvasManager: CanvasManager | undefined
 
     getThreshold(): number {
@@ -76,10 +77,7 @@ class TouchStick extends VirtualJoystick {
     private setupListener = () => {
         this.detect()
         this.deltaPositionSmoothed = this.smoothDeltaPosition()
-        this.direction = this.getDirection(
-            this.deltaPosition.x,
-            this.deltaPosition.y,
-        )
+        this.direction = this.getDirection(this.deltaPosition.x, this.deltaPosition.y)
         requestAnimationFrame(this.setupListener)
     }
 
@@ -97,45 +95,41 @@ class TouchStick extends VirtualJoystick {
 
         if (pressed) {
             this.lastStartTouchTime = currentTime
-            this.detectSwipes(deltaPosition)
             this.detectHold(currentTime)
             this.detectHoldCenter(currentTime, deltaPosition)
             if (!this.tap) {
                 this.lastStartTapTime = currentTime
             }
         } else {
+            this.swipeHandled = this.detectSwipes(deltaPosition)
             this.detectTap(currentTime)
             this.lastEndTouchTime = currentTime
-            this.reset()
+            if (!this.swipeHandled) {
+                this.reset()
+            }
         }
     }
 
     private detectSwipes(deltaPosition: { x: number; y: number }) {
-        const thresholdY = 0.1
-        const thresholdX = 0.1
+        const thresholdY = 0.05
+        const thresholdX = 0.05
         const deltaY = deltaPosition.y
         const deltaX = deltaPosition.x
 
-        if (this.endTouch < 300 && this.startTouch < 300) {
+        if (this.endTouch < 200 && this.startTouch < 2000 && this.endSwipe > 250) {
             if (Math.abs(deltaY) > thresholdY && Math.abs(deltaX) < thresholdX) {
                 this.swipe.up = deltaY > 0
                 this.swipe.down = deltaY < 0
-            } else if (
-                Math.abs(deltaX) > thresholdX &&
-                Math.abs(deltaY) < thresholdY
-            ) {
+            } else if (Math.abs(deltaX) > thresholdX && Math.abs(deltaY) < thresholdY) {
                 this.swipe.right = deltaX > 0
                 this.swipe.left = deltaX < 0
             }
-            if (
-                this.swipe.up ||
-                this.swipe.down ||
-                this.swipe.left ||
-                this.swipe.right
-            ) {
+            if (this.swipe.up || this.swipe.down || this.swipe.left || this.swipe.right) {
                 this.lastEndSwipeTime = new Date().getTime()
+                return true
             }
         }
+        return false
     }
 
     private detectHold(currentTime: number) {
@@ -149,22 +143,13 @@ class TouchStick extends VirtualJoystick {
         }
     }
 
-    private detectHoldCenter(
-        currentTime: number,
-        deltaPosition: { x: number; y: number },
-    ) {
+    private detectHoldCenter(currentTime: number, deltaPosition: { x: number; y: number }) {
         const thresholdY = 0.005
         const thresholdX = 0.005
         const deltaY = deltaPosition.y
         const deltaX = deltaPosition.x
 
-        if (
-            this.startHold < 500 &&
-            this.hold &&
-            !this.holdCenter &&
-            Math.abs(deltaY) <= thresholdY &&
-            Math.abs(deltaX) <= thresholdX
-        ) {
+        if (this.startHold < 500 && this.hold && !this.holdCenter && Math.abs(deltaY) <= thresholdY && Math.abs(deltaX) <= thresholdX) {
             this.lastStartHoldCenterTime = currentTime
             this.holdCenter = true
         } else if (this.startHoldCenter >= 500) {
@@ -173,18 +158,8 @@ class TouchStick extends VirtualJoystick {
     }
 
     private detectTap(currentTime: number) {
-        if (
-            !this.doubleTap &&
-            !this.tap &&
-            !this.hold &&
-            this.startTap < 50 &&
-            this.endSwipe > 350
-        ) {
-            this.tap =
-                !(this.startTap < 50 && this.hold) &&
-                this.endTap > 150 &&
-                !this.hold &&
-                this.endHold < 250
+        if (!this.doubleTap && !this.tap && !this.hold && this.startTap < 50 && this.endSwipe > 350) {
+            this.tap = !(this.startTap < 50 && this.hold) && this.endTap > 150 && !this.hold && this.endHold < 250
             if (this.tap) {
                 if (this.endTap < 450) {
                     this.doubleTap = true
@@ -212,8 +187,7 @@ class TouchStick extends VirtualJoystick {
             return Vector3.Zero()
         }
         const scaleFactor = 3
-        const scaledLength =
-            Math.pow(joystickVector.length(), scaleFactor) * this.directionSensitivity
+        const scaledLength = Math.pow(joystickVector.length(), scaleFactor) * this.directionSensitivity
         const cappedLength = Math.min(scaledLength, this.directionMaxLength)
         return joystickVector.normalize().scale(cappedLength)
     }
@@ -237,6 +211,7 @@ class TouchStick extends VirtualJoystick {
         this.swipe = { up: false, down: false, right: false, left: false }
         this.deltaPosition.y = 0
         this.deltaPosition.x = 0
+        this.swipeHandled = false
     }
 
     enableCanvasManager() {
