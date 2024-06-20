@@ -72,10 +72,8 @@ export default class CanvasManager {
       canvas.style.height = '100%'
       canvas.style.top = 'inherit'
       canvas.style.bottom = '0'
-      canvas.style.background =
-          'linear-gradient(to top, rgba(0,0,0,0.78) 0%, rgba(0,0,0,0) 10%, rgba(0,0,0,0) 100%)'
-      canvas.style.transition =
-          'height 0.5s ease, bottom 0.5s ease, background 0.5s ease'
+      canvas.style.background = 'linear-gradient(to top, rgba(0,0,0,0.78) 0%, rgba(0,0,0,0) 10%, rgba(0,0,0,0) 100%)'
+      canvas.style.transition = 'height 0.5s ease, bottom 0.5s ease, background 0.5s ease'
     }
   }
 
@@ -92,10 +90,8 @@ export default class CanvasManager {
       canvas.style.top = 'inherit'
       canvas.style.bottom = '0'
       canvas.style.height = '0%'
-      canvas.style.background =
-          'linear-gradient(to top, rgba(0,0,0,0.78) 0%, rgba(0,0,0,0) 10%, rgba(0,0,0,0) 100%)'
-      canvas.style.transition =
-          'height 0.5s ease, bottom 0.5s ease, background 0.5s ease'
+      canvas.style.background = 'linear-gradient(to top, rgba(0,0,0,0.78) 0%, rgba(0,0,0,0) 10%, rgba(0,0,0,0) 100%)'
+      canvas.style.transition = 'height 0.5s ease, bottom 0.5s ease, background 0.5s ease'
     }
   }
 
@@ -159,14 +155,9 @@ export default class CanvasManager {
     const swipeTime = new Date().getTime() - this.touchStartTime
     const threshold = this.threshold
     const screenHeight = window.innerHeight
-    const lowerScreenThreshold =
-        screenHeight *
-        (this.visible ? this.swipeScreenPartApp : this.swipeScreenPartStick)
+    const lowerScreenThreshold = screenHeight * (this.visible ? this.swipeScreenPartApp : this.swipeScreenPartStick)
 
-    if (
-        this.touchStartY > lowerScreenThreshold &&
-        swipeTime < this.maxSwipeTime
-    ) {
+    if (this.touchStartY > lowerScreenThreshold && swipeTime < this.maxSwipeTime) {
       if (Math.abs(deltaX) > Math.abs(deltaY)) {
         if (deltaX > threshold) {
           this.swipe.right = true
