@@ -1,8 +1,8 @@
 {
   "name": "babylonjs-touchstick",
-  "version": "0.0.12",
+  "version": "0.0.13",
   "type": "module",
   "dependencies": {
-    "babylonjs": "^7.*"
+    "babylonjs": "^7.* || ^8.* || ^9.*"
   }
 }

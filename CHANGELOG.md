@@ -1,5 +1,9 @@
 ## BabylonJS Touch Stick change log
 
+#### 0.0.13 - 2026-04-30
+
+- updated requirements for BabylonJS version (up to 9)
+
 #### 0.0.12 - 2024-06-20
 
 - Improved swipe functionality. False positives are excluded. Activation occurs only when you lift your finger from the touchscreen.
